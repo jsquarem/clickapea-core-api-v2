@@ -2,12 +2,14 @@ require('dotenv').config();
 const RecipeBook = require('../models/recipeBook');
 const RecipeURL = require('../models/recipeURL');
 const Profile = require('../models/profile');
-const Recipe = require('../models/recipe');
-const ImportedRecipe = require('./recipeService');
+const ImportedRecipe = require('../models/importedRecipe');
+const NormalizedRecipe = require('../models/normalizedRecipe');
+const RecipeImport = require('./recipeImportServiceNew');
 const RapidAPIService = require('./rapidAPIService');
 const { convertRecipeImageOnImport } = require('./convertImageService');
 const mongoose = require('mongoose');
 const profile = require('../models/profile');
+const importedRecipe = require('../models/importedRecipe');
 
 //=========== Helper functions =====================//
 
@@ -61,12 +63,26 @@ const findOneOrCreateRecipeDocument = async (
   recipeURLDocument,
   recipeData = null
 ) => {
-  let recipeDocument = await Recipe.findOne({
+  // Initialize recipeDocument and search for Normalized Recipe
+  let recipeDocument = await NormalizedRecipe.findOne({
     recipeURL: recipeURLDocument._id
-  }).populate('ingredients cuisines dishTypes diets occasions equipment');
+  }).populate('cuisines dishTypes diets occasions equipment');
   if (recipeDocument) {
     return recipeDocument;
   }
+  // Check if imported recipe exists
+  let importedRecipeDocument = await ImportedRecipe.findOne({
+    recipeURL: recipeURLDocument._id
+  });
+
+  if (!importedRecipeDocument) {
+    const importedRecipe = {
+      recipeURL: recipeURLDocument._id,
+      recipeDataSource: 'spoonacularAPI',
+      importedRecipeData: ''
+    };
+  }
+
   console.log(recipeData, '<-recipeData');
   if (!recipeData) {
     recipeData = await fetchRapidAPIRecipe(recipeURLDocument);

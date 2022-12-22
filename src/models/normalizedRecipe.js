@@ -7,6 +7,7 @@ const normalizedRecipeSchema = new mongoose.Schema(
       ref: 'NormalizedRecipe',
       default: null
     },
+    recipeURL: { type: mongoose.Schema.Types.ObjectId, ref: 'RecipeURL' },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile' },
     public: {
       type: Boolean,
@@ -77,4 +78,4 @@ const normalizedRecipeSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('NormalizedRecipe', recipeSchema);
+module.exports = mongoose.model('NormalizedRecipe', normalizedRecipeSchema);

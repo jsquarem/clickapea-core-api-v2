@@ -4,7 +4,7 @@ const {
   fetchRecipesByDishType,
   updateFavoriteRecipes,
   createEditedRecipe
-} = require('../services/recipeServices');
+} = require('../services/recipeServicesNew');
 const GoogleRecipeSchema = require('../services/googleRecipeSchemaService');
 const { getIngredientsByRecipeID } = require('../services/ingredientService');
 const { getAllDishTypes } = require('../services/dishTypeService');
@@ -90,7 +90,7 @@ const getRecipeByID = async (req, res) => {
     );
     const recipeSchema = new GoogleRecipeSchema(recipe);
     const googleSchema = await recipeSchema.createGoogleRecipeSchema(recipe);
-    console.log(googleSchema, '<-googleSchema');
+    // console.log(googleSchema, '<-googleSchema');
     res.status(201).json({
       recipe,
       profile: '',
