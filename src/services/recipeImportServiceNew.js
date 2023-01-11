@@ -19,12 +19,12 @@ class ImportedRecipe {
       recipeURL: this.recipeURLDocument,
       recipeDataSource: this.recipeDataSource,
       importedRecipeData: this.recipeData
-      
     };
   }
 
-  async createNormalizedRecipeDocument(recipeData, profileID) {
+  async createNormalizedRecipeDocument(recipeID, profileID) {
     return {
+      importedRecipe: recipeID,
       primeRecipe: null,
       owner: profileID,
       public: false,

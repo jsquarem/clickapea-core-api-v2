@@ -3,7 +3,8 @@ const RecipeBook = require('../models/recipeBook');
 const RecipeURL = require('../models/recipeURL');
 const Profile = require('../models/profile');
 const Recipe = require('../models/recipe');
-const ImportedRecipe = require('./recipeService');
+const RawRecipe = require('../models/rawRecipe');
+const RecipeImport = require('./recipeImportServiceNew');
 const RapidAPIService = require('./rapidAPIService');
 const { convertRecipeImageOnImport } = require('./convertImageService');
 const mongoose = require('mongoose');
@@ -61,17 +62,31 @@ const findOneOrCreateRecipeDocument = async (
   recipeURLDocument,
   recipeData = null
 ) => {
+  // Initialize recipeDocument and search for Recipe
   let recipeDocument = await Recipe.findOne({
     recipeURL: recipeURLDocument._id
-  }).populate('ingredients cuisines dishTypes diets occasions equipment');
+  }).populate('cuisines dishTypes diets occasions equipment');
   if (recipeDocument) {
     return recipeDocument;
   }
+  // Check if imported recipe exists
+  let importedRecipeDocument = await RawRecipe.findOne({
+    recipeURL: recipeURLDocument._id
+  });
+
+  if (!importedRecipeDocument) {
+    const importedRecipe = {
+      recipeURL: recipeURLDocument._id,
+      recipeDataSource: 'spoonacularAPI',
+      importedRecipeData: ''
+    };
+  }
+
   console.log(recipeData, '<-recipeData');
   if (!recipeData) {
     recipeData = await fetchRapidAPIRecipe(recipeURLDocument);
   }
-  const newRecipe = new ImportedRecipe(recipeData, recipeURLDocument);
+  const newRecipe = new RawRecipe(recipeData, recipeURLDocument);
   const recipeObject = await newRecipe.generateRecipeObject();
   recipeDocument = await Recipe.create(recipeObject);
   recipeDocument = await recipeDocument.populate(

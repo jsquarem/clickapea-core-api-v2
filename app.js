@@ -48,6 +48,7 @@ app.use('/api/recipes/categories', require('./src/routes/api/dishTypes'));
 app.use('/api/recipes', require('./src/routes/api/recipes'));
 app.use('/api/books', require('./src/routes/api/recipeBooks'));
 app.use('/api/planner', require('./src/routes/api/planner'));
+app.use('/api/database', require('./src/routes/api/database'))
 
 if (process.env.SENTRY_URL) {
   app.use(Sentry.Handlers.errorHandler());
