@@ -65,6 +65,18 @@ const normalizedRecipeSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    summary: {
+      type: String,
+      default: null
+    },
+    aggregateLikes: {
+      type: Number,
+      default: 0
+    },
+    servings: {
+      type: Number,
+      default: 0
+    },
     extendedIngredients: [],
     equipment: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Equipment' }],
     cuisines: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cuisine' }],

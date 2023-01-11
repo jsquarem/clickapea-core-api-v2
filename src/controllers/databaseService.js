@@ -2,10 +2,9 @@ require('dotenv').config();
 const RecipeBook = require('../models/recipeBook');
 const RecipeURL = require('../models/recipeURL');
 const Profile = require('../models/profile');
+const User = require('../models/user');
 const Recipe = require('../models/recipe');
-const ImportedRecipe = require('../models/importedRecipe');
-const NormalizedRecipe = require('../models/normalizedRecipe');
-const importedRecipe = require('../models/importedRecipe');
+const RawRecipe = require('../models/rawRecipe');
 const RecipeImport = require('../services/recipeImportServiceNew');
 // const RapidAPIService = require('../services/rapidAPIService');
 const mongoose = require('mongoose');
@@ -23,22 +22,34 @@ const findDuplicates = (arr) => {
 };
 
 const populateImportedRecipes = async (req, res) => {
-  // console.log('here1');
-  let count = 0;
-  const titleArray = [];
+  // const recipeBooks = await RecipeBook.find({});
+  // const recipeProfiles = {};
+  // for (const recipeBook of recipeBooks) {
+  //   const profileID = recipeBook.profile;
+  //   const recipes = recipeBook.recipes;
+  //   for (const recipe of recipes) {
+  //     recipeProfiles[recipe._id] = profileID;
+  //   }
+  // }
+  // console.log(recipeProfiles);
+  // console.log(`${Object.keys(recipeProfiles).length} Recipes owned`);
+  const unownedRecipes = await Recipe.find({ owner: null });
+  console.log(unownedRecipes.length);
+  const user = await User.find({ email: 'j.martin0027@gmail.com' });
+  console.log(user);
+
   try {
-    for await (const importedRecipe of Recipe.find({})) {
+    let count = 1;
+    for (const recipe of unownedRecipes) {
+      console.log(`Updating ${recipe._id} - count ${count}`);
+      const recipeObject = await Recipe.findOne({ _id: recipe._id });
+      recipeObject.owner = user.profile;
+      recipeObject.public = true;
+      recipeObject.primeRecipe = null;
+      recipeObject.save();
       count++;
-      // console.log(importedRecipe.title, '<-importedRecipe');
-      titleArray.push(importedRecipe.title);
-      //console.log(count);
     }
 
-    const duplicateRecipes = findDuplicates(titleArray);
-    console.log(duplicateRecipes, '<-duplicateRecipes');
-    // const importedRecipes = await Recipe.find({});
-    // console.log('here3');
-    console.log(count);
     res.status(201).send();
   } catch (err) {
     console.log(err);
